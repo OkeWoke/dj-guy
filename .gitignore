@@ -1,0 +1,7 @@
+token.txt
+bot-env/
+credentials.pickle
+secrets.txt
+client_secrets.json
+app.db
+__pycache__/
