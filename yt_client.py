@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 import os
-import json
 import pickle
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -12,7 +11,7 @@ class youtube_client:
     youtube_pattern = re.compile("(?:[?&]v=|\/embed\/|\/1\/|\/v\/|https:\/\/(?:www\.)?youtu\.be\/)([^&\n?#]+)$")
 
     def __init__(self):
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "0"
 
         scopes = ["https://www.googleapis.com/auth/youtube.readonly", "https://www.googleapis.com/auth/youtube.force-ssl"]
         api_service_name = "youtube"
@@ -31,8 +30,11 @@ class youtube_client:
             else:
                 print("Fetching new tokens...")
                 flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(client_secrets_file, scopes=scopes)
-                flow.run_local_server(port=8080, prompt="consent", authorization_prompt_message='')
+   
+                flow.run_local_server(host='localhost', port=8080, prompt="consent", authorization_prompt_message='')#
+                
                 credentials = flow.credentials
+                
                 with open("credentials.pickle", "wb") as f:
                     print("saving credentials...")
                     pickle.dump(credentials, f)
@@ -81,4 +83,4 @@ class youtube_client:
 
 if __name__ == "__main__":
     yt = youtube_client()
-    print(yt.get_playlist_id_by_name("Andy"))
+    print(yt.get_playlist_id_by_name("ANDYPANTS DISCORD"))
