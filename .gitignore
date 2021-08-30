@@ -5,3 +5,4 @@ secrets.txt
 client_secrets.json
 app.db
 __pycache__/
+bookmark.txt

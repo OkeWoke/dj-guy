@@ -3,6 +3,7 @@ import logging
 import datetime
 import aiosqlite
 import sqlite3
+import hashlib
 from yt_client import youtube_client
 
 logging.basicConfig(level=logging.INFO)
@@ -37,29 +38,54 @@ async def db_ifExists(url):
         return False
     return True
 
+def set_bookmark(bookmark):
+    bookmark_file = open("bookmark.txt", "w")
+    bookmark_file.write(bookmark)
+    bookmark_file.close()
+
 class AndyBot(discord.Client):
 
-    async def on_ready(self):
-        self.yt_client = youtube_client()
+    async def on_ready(self, yt_client, bookmark):
+        self.yt_client = yt_client
+        await self.check_past_messages(bookmark)
         print("Logged on as {0}".format(self.user))
 
     async def on_message(self, message):
         if message.channel.id == MUSIC_CHANNEL_ID:
-            result, ids = youtube_client.get_video_ids(message.content)
-            if result:
-                for id in ids:
-                    url = "https://youtu.be/"+id
-                    exists = await db_ifExists(url) # Check if we already have this video in the database...
-                    if not exists:
-                        title = self.yt_client.add_video_to_playlist(YT_PLAYLIST_ID, id)
-                        await db_insert(datetime.datetime.now(), title, url)
+            self.yt_link_process(message.content)
+            
 
+    async def yt_link_process(self, message):
+        result, ids = youtube_client.get_video_ids(message)
+        if result:
+            for id in ids:
+                url = "https://youtu.be/"+id
+                exists = await db_ifExists(url) # Check if we already have this video in the database...
+                if not exists:
+                    title = self.yt_client.add_video_to_playlist(YT_PLAYLIST_ID, id)
+                    await db_insert(datetime.datetime.now(), title, url)
+
+    async def check_past_messages(self, bookmark):
+        music_channel = self.get_channel(MUSIC_CHANNEL_ID)
+        new_bookmark = await music_channel.history(limit=1).flatten()[0] #get first id
+        
+        async for m in music_channel.history():
+            if m.id == bookmark:
+                break
+            else:
+                self.yt_link_process(m.content)
+        set_bookmark(new_bookmark)
 
 if __name__ == "__main__": 
     secret_file = open("secrets.txt", "r")
     token = secret_file.readline()
     secret_file.close()
+    
+    bookmark_file = open("bookmark.txt", "r")
+    bookmark = bookmark_file.readline()
+    bookmark_file.close()
 
+    yt_client = youtube_client()
     intents = discord.Intents(guilds=True, messages=True)
-    client = AndyBot(intents=intents)
+    client = AndyBot(yt_client, bookmark, intents=intents)
     client.run(token)
