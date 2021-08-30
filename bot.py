@@ -55,7 +55,7 @@ class AndyBot(discord.Client):
 
     async def on_message(self, message):
         if message.channel.id == MUSIC_CHANNEL_ID:
-            self.yt_link_process(message.content)
+            await self.yt_link_process(message.content)
             
 
     async def yt_link_process(self, message):
