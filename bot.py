@@ -40,7 +40,7 @@ async def db_ifExists(url):
 
 def set_bookmark(bookmark):
     bookmark_file = open("bookmark.txt", "w")
-    bookmark_file.write(bookmark)
+    bookmark_file.write(str(bookmark))
     bookmark_file.close()
 
 class AndyBot(discord.Client):
@@ -73,7 +73,7 @@ class AndyBot(discord.Client):
         first_msg_list = await music_channel.history(limit=1).flatten() #get first id
         new_bookmark = first_msg_list[0].id
         async for m in music_channel.history():
-            if m.id == bookmark:
+            if str(m.id) == bookmark:
                 break
             else:
                 await self.yt_link_process(m.content)
