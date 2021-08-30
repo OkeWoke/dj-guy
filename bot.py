@@ -76,7 +76,7 @@ class AndyBot(discord.Client):
             if m.id == bookmark:
                 break
             else:
-                self.yt_link_process(m.content)
+                await self.yt_link_process(m.content)
         set_bookmark(new_bookmark)
 
 if __name__ == "__main__": 
