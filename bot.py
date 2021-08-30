@@ -70,8 +70,8 @@ class AndyBot(discord.Client):
 
     async def check_past_messages(self, bookmark):
         music_channel = self.get_channel(MUSIC_CHANNEL_ID)
-        new_bookmark = await music_channel.history(limit=1).flatten()[0] #get first id
-        
+        first_msg_list = await music_channel.history(limit=1).flatten() #get first id
+        new_bookmark = first_msg_list[0].id
         async for m in music_channel.history():
             if m.id == bookmark:
                 break
