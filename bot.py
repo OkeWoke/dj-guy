@@ -45,8 +45,11 @@ def set_bookmark(bookmark):
 
 class AndyBot(discord.Client):
 
-    async def on_ready(self, yt_client, bookmark):
-        self.yt_client = yt_client
+    async def on_ready(self, ):
+        self.yt_client = youtube_client()
+        bookmark_file = open("bookmark.txt", "r")
+        bookmark = bookmark_file.readline()
+        bookmark_file.close()
         await self.check_past_messages(bookmark)
         print("Logged on as {0}".format(self.user))
 
@@ -80,12 +83,7 @@ if __name__ == "__main__":
     secret_file = open("secrets.txt", "r")
     token = secret_file.readline()
     secret_file.close()
-    
-    bookmark_file = open("bookmark.txt", "r")
-    bookmark = bookmark_file.readline()
-    bookmark_file.close()
 
-    yt_client = youtube_client()
     intents = discord.Intents(guilds=True, messages=True)
-    client = AndyBot(yt_client, bookmark, intents=intents)
+    client = AndyBot(intents=intents)
     client.run(token)
