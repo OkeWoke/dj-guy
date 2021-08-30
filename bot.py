@@ -74,14 +74,12 @@ class AndyBot(discord.Client):
         new_bookmark = first_msg_list[0].id
         async for m in music_channel.history(limit=None):
             if str(m.id) == bookmark:
-                print("hit bookmark breaking")
                 break
             else:
-                print("found new song")
                 await self.yt_link_process(m.content)
         
         set_bookmark(new_bookmark)
-        print("Finished check")
+        print("Finished history check")
 
 if __name__ == "__main__": 
     secret_file = open("secrets.txt", "r")
