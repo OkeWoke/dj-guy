@@ -8,7 +8,7 @@ import googleapiclient.errors
 from google.auth.transport.requests import Request
 
 class youtube_client:
-    youtube_pattern = re.compile("(?:[?&]v=|\/embed\/|\/1\/|\/v\/|https:\/\/(?:www\.)?youtu\.be\/)([^&\n?#]+)$")
+    youtube_pattern = re.compile("http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?")
 
     def __init__(self):
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "0"
@@ -75,12 +75,23 @@ class youtube_client:
     def get_video_ids(message):
         ids = []
         for sub_msg in message.split(' '):
+            sub_msg = sub_msg.strip("/")
             for m in youtube_client.youtube_pattern.findall(sub_msg):
                 if m not in ids:
-                    ids.append(m)
+                    ids.append(m[0])
                 
         return len(ids) > 0, ids 
 
+def url_tests():
+    urls = ["https://www.youtube.com/watch?v=clKdNG_ZtXI&list=PL2qUo84aqmErtH3eSgzJ_bEXyYY_B_bFz&index=5", "asdasdasd asdfsdf", "https://youtu.be/qnYHA9saUN1 https://youtu.be/qnYHA9saUN0", "https://youtu.be/qnYHA9saUN0", "https://www.youtube.com/watch?v=qnYHA9saUN0", "https://www.youtube.com/watch?v=qnYHA9saUN0 asdasd", "https://www.youtube.com/watch?v=qnYHA9saUN0/", "https://www.youtube.com/watch?v=qnYHA9saUN0/aasd"]
+    for i, url in enumerate(urls):
+        noids, ids = youtube_client.get_video_ids(url)
+        try:
+            assert(noids == 1)
+            print(ids)
+        except:
+            print("NO VALID URL FOUND: ", url)
+
+
 if __name__ == "__main__":
-    yt = youtube_client()
-    print(yt.get_playlist_id_by_name("ANDYPANTS DISCORD"))
+    url_tests()
